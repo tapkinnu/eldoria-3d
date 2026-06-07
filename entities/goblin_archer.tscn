@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://entities/enemy.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/textures/goblin_archer.png" id="2"]
+
+[sub_resource type="CapsuleShape3D" id="1"]
+radius = 0.3
+height = 1.4
+
+[node name="GoblinArcher" type="CharacterBody3D" groups=["enemy"]]
+collision_layer = 4
+collision_mask = 15
+script = ExtResource("1")
+max_hp = 30
+damage = 8
+is_ranged = true
+move_speed = 2.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("1")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+texture = ExtResource("2")
+pixel_size = 0.016
+billboard = 2
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+
+[node name="AttackTimer" type="Timer" parent="."]
+one_shot = true
