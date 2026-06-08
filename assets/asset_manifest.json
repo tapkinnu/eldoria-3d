@@ -1,7 +1,7 @@
 {
   "pack": "eldoria-core",
   "style": "Dark fantasy dungeon crawler, painterly digital illustration, crimson and midnight blue palette, torch-lit gothic atmosphere",
-  "generated_at": "2026-06-08T02:30:00Z",
+  "generated_at": "2026-06-08T10:00:00Z",
   "assets": [
     {
       "id": "title_keyart_01",
@@ -11,6 +11,24 @@
       "source": "FAL (fal-ai/fast-sdxl)",
       "size": [1024, 576],
       "status": "integrated"
+    },
+    {
+      "id": "upgrade_shrine_01",
+      "type": "sprite",
+      "path": "res://assets/generated/upgrade_shrine.png",
+      "prompt": "Original dark fantasy game asset, upgrade shrine altar in a torch-lit dungeon, ancient stone pedestal with glowing crimson runes and a floating blue crystal, scattered gold coins and potion bottles around the base, painterly digital illustration style, centered composition, readable silhouette, transparent background, no text, no logo, no watermark, no existing IP, suitable for Godot import as a billboard sprite",
+      "source": "FAL (fal-ai/fast-sdxl)",
+      "size": [1024, 1024],
+      "status": "integrated"
+    },
+    {
+      "id": "necromancer_mage_01",
+      "type": "sprite",
+      "path": "res://assets/generated/necromancer_mage.png",
+      "prompt": "Original dark fantasy game asset, dark necromancer mage enemy concept, hooded figure with glowing purple eyes, holding a twisted staff with a skull on top, tattered robes floating in shadow magic, menacing stance, transparent background, centered, painterly digital illustration, readable silhouette, no text, no logo, no watermark, no existing IP, suitable for Godot import as billboard sprite",
+      "source": "FAL (fal-ai/fast-sdxl)",
+      "size": [1024, 1024],
+      "status": "generated"
     },
     {
       "id": "intro_narration_voice",
@@ -55,6 +73,33 @@
       "prompt": "Short 1500Hz sine blip, 50ms",
       "source": "procedural_python_wave",
       "duration_seconds": 0.05,
+      "status": "integrated"
+    },
+    {
+      "id": "sfx_purchase",
+      "type": "sfx",
+      "path": "res://assets/audio/sfx/purchase.wav",
+      "prompt": "Cascading major triad 660-880-1320Hz with shimmer envelope, 350ms",
+      "source": "procedural_python_wave",
+      "duration_seconds": 0.35,
+      "status": "integrated"
+    },
+    {
+      "id": "sfx_level_up",
+      "type": "sfx",
+      "path": "res://assets/audio/sfx/level_up.wav",
+      "prompt": "C major major triad 523-659-784Hz with shimmer tail, 600ms",
+      "source": "procedural_python_wave",
+      "duration_seconds": 0.6,
+      "status": "integrated"
+    },
+    {
+      "id": "sfx_upgrade_apply",
+      "type": "sfx",
+      "path": "res://assets/audio/sfx/upgrade_apply.wav",
+      "prompt": "Short 1046Hz sine blip fast envelope, 250ms",
+      "source": "procedural_python_wave",
+      "duration_seconds": 0.25,
       "status": "integrated"
     }
   ]

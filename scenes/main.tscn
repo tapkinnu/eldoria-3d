@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://entities/player.tscn" id="2"]
 [ext_resource type="Script" path="res://systems/level_generator.gd" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/hud_3d.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/upgrade_panel.tscn" id="5"]
 
 [sub_resource type="Environment" id="1"]
 background_mode = 1
@@ -140,3 +141,6 @@ offset_bottom = 60.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Play Again"
+
+[node name="UpgradePanel" parent="CanvasLayer" instance=ExtResource("5")]
+visible = false

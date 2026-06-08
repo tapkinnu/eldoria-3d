@@ -130,6 +130,7 @@ func _build_room(pos: Vector3, size: Vector3, type: String) -> void:
 	if type == "start":
 		_add_torch(room, pos + Vector3(-half_x + 0.5, 2.5, 0))
 		_add_torch(room, pos + Vector3(half_x - 0.5, 2.5, 0))
+		_add_shrine(room, pos + Vector3(0, 0, half_z - 1.5))
 	elif type == "boss":
 		_add_boss(room, pos)
 		_add_portal(room, pos + Vector3(0, 0, half_z - 1.0))
@@ -235,6 +236,11 @@ func _add_portal(parent: Node, pos: Vector3) -> void:
 	var portal: Portal = preload("res://entities/portal.tscn").instantiate()
 	portal.position = pos
 	parent.add_child(portal)
+
+func _add_shrine(parent: Node, pos: Vector3) -> void:
+	var shrine: UpgradeShrine = preload("res://entities/upgrade_shrine.tscn").instantiate()
+	shrine.position = pos
+	parent.add_child(shrine)
 
 func _add_torch(parent: Node, pos: Vector3) -> void:
 	var light := OmniLight3D.new()

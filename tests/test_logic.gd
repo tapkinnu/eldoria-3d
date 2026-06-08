@@ -52,4 +52,33 @@ func _run_tests() -> void:
 	State.add_coin()
 	assert(State.coins == 1, "Should have 1 coin")
 	
+	# Test upgrade system
+	State.coins = 5
+	assert(not State.can_upgrade("hp"), "Should not afford upgrade with 5 coins")
+	State.coins = 15
+	assert(State.can_upgrade("hp"), "Should afford upgrade with 15 coins")
+	assert(State.apply_upgrade("hp"), "apply_upgrade hp should succeed")
+	assert(State.hp_upgrades == 1, "hp_upgrades should be 1")
+	assert(State.player_max_hp == 125, "max hp should be 125 after upgrade")
+	assert(State.player_hp == 125, "hp should refill to 125")
+	assert(State.coins == 5, "coins should be 5 (15 - 10)")
+	
+	# Test damage upgrade
+	State.coins = 20
+	assert(State.apply_upgrade("dmg"), "apply_upgrade dmg should succeed")
+	assert(State.dmg_upgrades == 1, "dmg_upgrades should be 1")
+	assert(State.player_damage == 25, "damage should be 25")
+	
+	# Test increasing cost
+	assert(State.get_upgrade_cost("hp") == 15, "Second hp upgrade should cost 15")
+	
+	# Test save/load roundtrip
+	State.save_game()
+	var State2 := GameStateClass.new()
+	State2.load_game()
+	assert(State2.hp_upgrades == 1, "Loaded hp_upgrades should be 1")
+	assert(State2.dmg_upgrades == 1, "Loaded dmg_upgrades should be 1")
+	assert(State2.player_max_hp == 125, "Loaded max hp should be 125")
+	assert(State2.player_damage == 25, "Loaded damage should be 25")
+	
 	print("ALL TESTS PASSED")

@@ -15,6 +15,7 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	attack_cooldown.timeout.connect(func(): can_attack = true)
 	GameState.hp_changed.connect(_on_hp_changed)
+	move_speed += GameState.spd_upgrades * 0.25
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
@@ -28,7 +29,7 @@ func _input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	if GameState.mode != GameState.GameMode.EXPLORING and GameState.mode != GameState.GameMode.COMBAT:
 		return
-
+	
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	

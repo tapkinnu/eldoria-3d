@@ -1,85 +1,99 @@
 #!/usr/bin/env python3
-"""Procedural SFX generator for Eldoria-3D using Python/wave."""
-import wave
-import struct
-import math
-import os
+"""Generate procedural game SFX using only Python standard library (wave, struct, math, random)."""
+import wave, struct, math, random, os
 
-OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "audio", "sfx")
-os.makedirs(OUT_DIR, exist_ok=True)
-RATE = 44100
+OUT_DIR = "assets/audio/sfx"
+SAMPLERATE = 44100
 
-def save_wave(samples: list[float], path: str):
-    with wave.open(path, "w") as w:
-        w.setnchannels(1)
-        w.setsampwidth(2)
-        w.setframerate(RATE)
-        for s in samples:
-            w.writeframesraw(struct.pack("<h", int(max(-1.0, min(1.0, s)) * 32767)))
+def write_wav(path: str, samples: list[int]) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with wave.open(path, "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(SAMPLERATE)
+        wf.writeframes(struct.pack("<" + "h" * len(samples), *samples))
 
-def white_noise(duration: float, amp: float = 0.3) -> list[float]:
-    import random
-    n = int(RATE * duration)
-    return [(random.random() * 2 - 1) * amp for _ in range(n)]
-
-def sine(freq: float, duration: float, amp: float = 0.5) -> list[float]:
-    n = int(RATE * duration)
-    return [amp * math.sin(2 * math.pi * freq * t / RATE) for t in range(n)]
-
-def square(freq: float, duration: float, amp: float = 0.4) -> list[float]:
-    n = int(RATE * duration)
-    return [amp * (-1.0 if math.sin(2 * math.pi * freq * t / RATE) >= 0 else 1.0) for t in range(n)]
-
-def envelope(samples: list[float], attack: float = 0.01, decay: float = 0.3) -> list[float]:
+def envelope(length: int, attack: int, decay: int) -> list[float]:
     out = []
-    n = len(samples)
-    a_samples = int(RATE * attack)
-    d_samples = int(RATE * decay)
-    for i, s in enumerate(samples):
-        if i < a_samples:
-            env = i / max(a_samples, 1)
-        elif i < a_samples + d_samples:
-            env = 1.0 - (i - a_samples) / max(d_samples, 1)
+    for i in range(length):
+        if i < attack:
+            out.append(i / max(1, attack))
+        elif i < attack + decay:
+            out.append(1.0 - (i - attack) / max(1, decay))
         else:
-            env = 0
-        out.append(s * max(0, env))
+            out.append(0.0)
     return out
 
-# Sword swing (short descending sawish noise)
-def gen_sword_swing():
-    base = [math.sin(2 * math.pi * (800 - (t / RATE) * 600) * t / RATE) * 0.5 for t in range(int(RATE * 0.15))]
-    noise = white_noise(0.15, 0.15)
-    mixed = [(b + n) * 0.5 for b, n in zip(base, noise)]
-    save_wave(envelope(mixed, 0.01, 0.12), os.path.join(OUT_DIR, "sword_swing.wav"))
+def noise(length: int, amp: float = 1.0) -> list[int]:
+    return [int(amp * (random.random() * 2.0 - 1.0) * 32767) for _ in range(length)]
 
-# Pickup/coin (rising sine arpeggio)
-def gen_pickup():
-    notes = [880, 1100, 1320]
-    dur = 0.06
-    samples = []
-    for freq in notes:
-        samples.extend(sine(freq, dur, 0.4))
-    save_wave(samples, os.path.join(OUT_DIR, "pickup.wav"))
+def sine(freq: float, length: int, amp: float = 1.0) -> list[int]:
+    return [int(amp * 32767 * math.sin(2.0 * math.pi * freq * i / SAMPLERATE)) for i in range(length)]
 
-# Player hurt (filtered noise burst)
-def gen_hurt():
-    n = white_noise(0.25, 0.4)
-    # simple low-pass-ish via averaging
-    out = []
-    prev = 0.0
-    for s in n:
-        val = (s + prev) * 0.5
-        out.append(val)
-        prev = val
-    save_wave(envelope(out, 0.01, 0.18), os.path.join(OUT_DIR, "hurt.wav"))
+def square(freq: float, length: int, amp: float = 1.0) -> list[int]:
+    return [int(amp * 32767 * (1.0 if math.sin(2.0 * math.pi * freq * i / SAMPLERATE) >= 0 else -1.0)) for i in range(length)]
 
-# UI click (short blip)
-def gen_ui_click():
-    save_wave(envelope(sine(1500, 0.05, 0.3), 0.005, 0.04), os.path.join(OUT_DIR, "ui_click.wav"))
+def saw(freq: float, length: int, amp: float = 1.0) -> list[int]:
+    return [int(amp * 32767 * (2.0 * ((freq * i / SAMPLERATE) % 1.0) - 1.0)) for i in range(length)]
+
+def mix(*tracks):
+    length = max(len(t) for t in tracks)
+    out = [0] * length
+    for t in tracks:
+        for i in range(len(t)):
+            out[i] += t[i]
+    for i in range(length):
+        out[i] = max(-32767, min(32767, out[i]))
+    return out
+
+def bandpass(samples: list[int], freq: float, bw: float) -> list[int]:
+    """Simple IIR bandpass approximation."""
+    f1 = freq - bw / 2
+    f2 = freq + bw / 2
+    r = 0.98
+    a = []
+    for s in samples:
+        a.append(s)
+    # just use a simple resonator; not perfect but ok for SFX
+    y = [0] * len(samples)
+    for i in range(2, len(samples)):
+        y[i] = int(r * (2 * a[i-1] - a[i-2]) + s)
+    return y
+
+def gen_purchase():
+    length = int(SAMPLERATE * 0.35)
+    env = envelope(length, int(SAMPLERATE * 0.02), int(SAMPLERATE * 0.25))
+    t1 = [int(e * 0.4 * 32767 * math.sin(2.0 * math.pi * 660.0 * i / SAMPLERATE)) for i, e in enumerate(env)]
+    t2 = [int(e * 0.3 * 32767 * math.sin(2.0 * math.pi * 880.0 * i / SAMPLERATE)) for i, e in enumerate(env)]
+    t3 = [int(e * 0.2 * 32767 * math.sin(2.0 * math.pi * 1320.0 * i / SAMPLERATE)) for i, e in enumerate(env)]
+    out = [t1[i] + t2[i] + t3[i] for i in range(length)]
+    out = [max(-32767, min(32767, int(x * 0.9))) for x in out]
+    write_wav(os.path.join(OUT_DIR, "purchase.wav"), out)
+    print("Generated purchase.wav")
+
+def gen_levelup():
+    length = int(SAMPLERATE * 0.6)
+    env = envelope(length, int(SAMPLERATE * 0.05), int(SAMPLERATE * 0.5))
+    base = 523.25
+    t1 = [int(e * 0.4 * 32767 * math.sin(2.0 * math.pi * base * i / SAMPLERATE)) for i, e in enumerate(env)]
+    t2 = [int(e * 0.3 * 32767 * math.sin(2.0 * math.pi * base * 1.25 * i / SAMPLERATE)) for i, e in enumerate(env)]
+    t3 = [int(e * 0.25 * 32767 * math.sin(2.0 * math.pi * base * 1.5 * i / SAMPLERATE)) for i, e in enumerate(env)]
+    shimmer = []
+    for i in range(length):
+        shimmer.append(int(0.08 * 32767 * math.sin(2.0 * math.pi * 2000.0 * i / SAMPLERATE) * math.exp(-3.0 * i / length)))
+    out = [t1[i] + t2[i] + t3[i] + shimmer[i] for i in range(length)]
+    out = [max(-32767, min(32767, int(x * 0.9))) for x in out]
+    write_wav(os.path.join(OUT_DIR, "level_up.wav"), out)
+    print("Generated level_up.wav")
+
+def gen_upgrade_apply():
+    length = int(SAMPLERATE * 0.25)
+    env = envelope(length, int(SAMPLERATE * 0.01), int(SAMPLERATE * 0.2))
+    out = [int(e * 0.5 * 32767 * math.sin(2.0 * math.pi * 1046.5 * i / SAMPLERATE)) for i, e in enumerate(env)]
+    write_wav(os.path.join(OUT_DIR, "upgrade_apply.wav"), out)
+    print("Generated upgrade_apply.wav")
 
 if __name__ == "__main__":
-    gen_sword_swing()
-    gen_pickup()
-    gen_hurt()
-    gen_ui_click()
-    print("SFX generated in", OUT_DIR)
+    gen_purchase()
+    gen_levelup()
+    gen_upgrade_apply()
