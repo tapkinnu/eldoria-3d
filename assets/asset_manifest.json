@@ -1,0 +1,61 @@
+{
+  "pack": "eldoria-core",
+  "style": "Dark fantasy dungeon crawler, painterly digital illustration, crimson and midnight blue palette, torch-lit gothic atmosphere",
+  "generated_at": "2026-06-08T02:30:00Z",
+  "assets": [
+    {
+      "id": "title_keyart_01",
+      "type": "key_art",
+      "path": "res://assets/generated/title_keyart.png",
+      "prompt": "Dark fantasy dungeon crawler key art, lone armored knight with glowing blue sword standing in a torch-lit stone corridor, skeleton warriors and goblin archers emerging from shadows, crumbling gothic pillars, volumetric fog, dramatic chiaroscuro lighting, rich deep crimson and midnight blue color palette, epic game title art composition, no text, no logo, no watermark, original IP, painterly digital illustration style, highly detailed, cinematic framing",
+      "source": "FAL (fal-ai/fast-sdxl)",
+      "size": [1024, 576],
+      "status": "integrated"
+    },
+    {
+      "id": "intro_narration_voice",
+      "type": "voice",
+      "path": "res://assets/audio/voices/intro_narration.mp3",
+      "prompt": "Welcome to Eldoria: Shadow Realms. Brave the dungeon depths, defeat the skeleton lord, and claim your freedom through the ancient portal.",
+      "source": "text_to_speech (edge provider / gemini fallback)",
+      "duration_seconds": 8,
+      "status": "integrated"
+    },
+    {
+      "id": "sfx_sword_swing",
+      "type": "sfx",
+      "path": "res://assets/audio/sfx/sword_swing.wav",
+      "prompt": "Procedural descending saw/noise burst with ADSR envelope (generated via Python/wave)",
+      "source": "procedural_python_wave",
+      "duration_seconds": 0.15,
+      "status": "integrated"
+    },
+    {
+      "id": "sfx_pickup",
+      "type": "sfx",
+      "path": "res://assets/audio/sfx/pickup.wav",
+      "prompt": "Rising sine arpeggio triplet 880-1100-1320Hz, 60ms per note",
+      "source": "procedural_python_wave",
+      "duration_seconds": 0.18,
+      "status": "integrated"
+    },
+    {
+      "id": "sfx_hurt",
+      "type": "sfx",
+      "path": "res://assets/audio/sfx/hurt.wav",
+      "prompt": "Filtered low-pass white noise burst with fast decay",
+      "source": "procedural_python_wave",
+      "duration_seconds": 0.25,
+      "status": "integrated"
+    },
+    {
+      "id": "sfx_ui_click",
+      "type": "sfx",
+      "path": "res://assets/audio/sfx/ui_click.wav",
+      "prompt": "Short 1500Hz sine blip, 50ms",
+      "source": "procedural_python_wave",
+      "duration_seconds": 0.05,
+      "status": "integrated"
+    }
+  ]
+}

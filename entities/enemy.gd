@@ -17,10 +17,13 @@ class_name EnemyController
 
 var dead: bool = false
 var can_attack: bool = true
+var _orig_modulate: Color
 
 func _ready() -> void:
 	attack_timer.wait_time = attack_cooldown
 	attack_timer.timeout.connect(func(): can_attack = true)
+	if sprite:
+		_orig_modulate = sprite.modulate
 	if player:
 		nav.target_position = player.global_position
 
@@ -96,8 +99,22 @@ func _ranged_attack() -> void:
 
 func take_damage(amount: int) -> void:
 	hp -= amount
+	_show_damage(amount)
+	_hit_flash()
 	if hp <= 0 and not dead:
 		_dead()
+
+func _hit_flash() -> void:
+	if sprite:
+		sprite.modulate = Color.WHITE
+		var tween := get_tree().create_tween()
+		tween.tween_property(sprite, "modulate", _orig_modulate, 0.15)
+
+func _show_damage(amount: int) -> void:
+	var dn: DamageNumber = preload("res://systems/damage_number.tscn").instantiate()
+	dn.global_position = global_position + Vector3.UP * 1.2
+	get_tree().current_scene.add_child(dn)
+	dn.start(amount)
 
 func _dead() -> void:
 	dead = true

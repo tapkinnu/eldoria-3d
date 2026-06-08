@@ -37,3 +37,10 @@ func _on_game_over(won: bool) -> void:
 func _restart() -> void:
 	GameState.reset_game()
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
+
+func play_sfx(stream_path: String) -> void:
+	var sfx: AudioStreamPlayer = $GameplaySFX
+	if sfx and ResourceLoader.exists(stream_path):
+		sfx.stream = load(stream_path)
+		sfx.play()
+
